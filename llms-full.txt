@@ -1,0 +1,514 @@
+# V Programming Language - Full Documentation
+
+V is a statically typed compiled programming language designed for building maintainable software.
+
+## Project Information
+
+- **Name**: V Programming Language  
+- **Version**: 0.4.12
+- **License**: MIT
+- **Repository**: https://github.com/vlang/v
+- **Original Repository**: https://github.com/vlang/v
+- **Description**: Simple, fast, safe, compiled language for developing maintainable software
+- **Source Files**: ~4,457 V files
+- **Language**: V, C (generated), JavaScript (backend)
+
+## Core Philosophy
+
+V promotes writing simple and clear code with minimal abstraction. Despite being simple, V gives developers significant power - anything you can do in other languages, you can do in V.
+
+## Key Features
+
+### Performance & Compilation
+- **Fast compilation**: ≈110k loc/s with Clang backend, ≈500k loc/s with native and tcc backends
+- **Self-compilation**: V compiles itself in less than a second
+- **Performance**: As fast as C (V's main backend compiles to human-readable C)
+- **Multiple backends**: C, JavaScript, native machine code, WebAssembly
+
+### Safety & Memory Management
+- **Memory safety**: No null pointers, no globals, no undefined behavior
+- **Immutability**: Immutable by default
+- **Flexible memory management**: 
+  - GC by default
+  - Manual memory management via `-gc none`
+  - Arena allocation via `-prealloc`
+  - Automatic free via `-autofree`
+
+### Development Experience
+- **Simplicity**: Language can be learned over a weekend
+- **Cross-platform**: Linux, macOS, Windows, *BSD, Solaris, WSL
+- **Hot code reloading**: For rapid development
+- **Built-in tooling**: Formatter, tester, package manager
+
+## Project Structure
+
+```
+v/
+├── cmd/                    # V compiler and command-line tools
+│   ├── v/                 # Main V compiler
+│   └── tools/             # Additional tools and utilities
+├── vlib/                  # V standard library (57+ modules)
+│   ├── builtin/           # Core language functionality
+│   ├── os/                # Operating system interface
+│   ├── net/               # Networking (HTTP, WebSocket, etc.)
+│   ├── json/              # JSON encoding/decoding
+│   ├── crypto/            # Cryptographic functions
+│   ├── db/                # Database drivers (MySQL, PostgreSQL, SQLite, etc.)
+│   ├── math/              # Mathematical functions
+│   ├── time/              # Time and date handling
+│   ├── regex/             # Regular expressions
+│   ├── arrays/            # Array utilities
+│   ├── strings/           # String manipulation
+│   ├── io/                # Input/output operations
+│   ├── sync/              # Synchronization primitives
+│   ├── encoding/          # Various encoding formats
+│   ├── compress/          # Compression algorithms
+│   ├── term/              # Terminal manipulation
+│   ├── cli/               # Command-line interface utilities
+│   ├── flag/              # Command-line flag parsing
+│   ├── toml/              # TOML configuration format
+│   ├── veb/               # V web framework
+│   ├── orm/               # Object-Relational Mapping
+│   ├── gg/                # Graphics library
+│   └── sokol/             # Sokol graphics bindings
+├── examples/              # Code examples and demos (67+ examples)
+│   ├── hello_world.v      # Basic hello world
+│   ├── 2048/              # 2048 game implementation
+│   ├── tetris/            # Tetris game with graphics
+│   ├── asteroids/         # Asteroids game
+│   ├── cli.v              # Command-line interface example
+│   ├── json_example.v     # JSON handling
+│   ├── websocket/         # WebSocket examples
+│   ├── database/          # Database connection examples
+│   ├── web_server/        # HTTP server examples
+│   ├── wasm/              # WebAssembly examples
+│   └── call_c_from_v/     # C interoperability
+├── doc/                   # Documentation
+│   ├── docs.md            # Complete language documentation
+│   └── upcoming.md        # Upcoming features
+├── thirdparty/            # Third-party dependencies
+├── ci/                    # Continuous integration scripts
+├── tutorials/             # Learning materials and tutorials
+├── bench/                 # Benchmarks and performance tests
+├── CHANGELOG.md           # Version history and changes
+├── CONTRIBUTING.md        # Contribution guidelines
+├── README.md              # Project overview and installation
+├── ROADMAP.md             # Future development plans
+└── v.mod                  # V module definition
+```
+
+## Core Language Features
+
+### Basic Syntax
+
+#### Hello World
+```v
+println('Hello, World!')
+```
+
+#### Variables and Constants
+```v
+// Variables (mutable)
+mut age := 25
+name := 'Alice'  // Immutable by default
+
+// Constants
+const pi = 3.14159
+const max_users = 100
+```
+
+#### Functions
+```v
+fn add(x int, y int) int {
+    return x + y
+}
+
+// Multiple return values
+fn divide(x f64, y f64) (f64, bool) {
+    if y == 0 {
+        return 0, false
+    }
+    return x / y, true
+}
+
+// Variable arguments
+fn sum(nums ...int) int {
+    mut total := 0
+    for num in nums {
+        total += num
+    }
+    return total
+}
+```
+
+#### Structs and Methods
+```v
+struct User {
+    name string
+    age  int
+mut:
+    email string
+}
+
+fn (u User) greet() string {
+    return 'Hello, I am ${u.name}'
+}
+
+fn (mut u User) have_birthday() {
+    u.age++
+}
+```
+
+#### Arrays and Maps
+```v
+// Arrays
+numbers := [1, 2, 3, 4, 5]
+mut names := ['Alice', 'Bob']
+names << 'Charlie'  // Append
+
+// Maps
+mut ages := map[string]int{}
+ages['Alice'] = 30
+ages['Bob'] = 25
+
+// Fixed size arrays
+matrix := [3][3]int{} // 3x3 matrix
+```
+
+#### Error Handling
+```v
+fn divide(x f64, y f64) !f64 {
+    if y == 0 {
+        return error('division by zero')
+    }
+    return x / y
+}
+
+// Using the function
+result := divide(10, 2) or {
+    println('Error: ${err}')
+    return
+}
+```
+
+#### Enums and Sum Types
+```v
+enum Color {
+    red
+    green  
+    blue
+}
+
+type Shape = Circle | Rectangle | Triangle
+
+struct Circle {
+    radius f64
+}
+
+struct Rectangle {
+    width  f64
+    height f64
+}
+```
+
+#### Concurrency
+```v
+import sync
+
+fn worker(id int, ch chan int) {
+    for {
+        task := <-ch or { break }
+        println('Worker ${id} processing ${task}')
+    }
+}
+
+fn main() {
+    ch := chan int{cap: 10}
+    
+    // Spawn workers
+    for i in 0..3 {
+        spawn worker(i, ch)
+    }
+    
+    // Send tasks
+    for i in 0..10 {
+        ch <- i
+    }
+    ch.close()
+}
+```
+
+## Standard Library Modules
+
+### Core Modules
+- **builtin**: Fundamental types and functions (string, array, map, etc.)
+- **os**: File system, environment variables, process management
+- **strconv**: String conversion utilities
+- **math**: Mathematical functions and constants
+
+### Networking
+- **net**: Low-level networking
+- **net.http**: HTTP client and server
+- **net.websocket**: WebSocket implementation
+- **net.urllib**: URL parsing and manipulation
+
+### Data Handling
+- **json**: JSON encoding/decoding with compile-time code generation
+- **encoding.base64**: Base64 encoding/decoding
+- **encoding.hex**: Hexadecimal encoding
+- **compress.gzip**: GZIP compression
+- **crypto**: Cryptographic functions (SHA, MD5, AES, etc.)
+
+### Database Support
+- **db.sqlite**: SQLite database driver
+- **db.mysql**: MySQL database driver  
+- **db.pg**: PostgreSQL database driver
+- **db.redis**: Redis client
+- **orm**: Object-Relational Mapping
+
+### Graphics and UI
+- **gg**: 2D graphics library
+- **sokol**: Cross-platform graphics (OpenGL, Metal, DirectX)
+- **ui**: Native UI framework
+
+### Utilities
+- **flag**: Command-line flag parsing
+- **cli**: CLI application framework  
+- **term**: Terminal manipulation and colors
+- **log**: Logging functionality
+- **time**: Date and time handling
+- **regex**: Regular expressions
+- **rand**: Random number generation
+
+## Build System and Tools
+
+### Compilation
+```bash
+# Basic compilation
+v hello.v                    # Creates executable
+v run hello.v               # Compile and run immediately
+
+# Production build
+v -prod hello.v             # Optimized build
+
+# Different backends
+v -backend js hello.v       # JavaScript output
+v -backend native hello.v   # Native machine code
+v -backend c hello.v        # C output (default)
+
+# Memory management options
+v -gc none hello.v          # No garbage collector
+v -autofree hello.v         # Automatic memory management
+v -prealloc hello.v         # Arena allocation
+```
+
+### Development Tools
+```bash
+# Format code
+v fmt file.v
+v fmt -w .                  # Format all files in directory
+
+# Run tests
+v test .                    # Run all tests
+v test file_test.v          # Run specific test
+
+# Package management
+v install module_name       # Install module
+v list                      # List installed modules
+
+# Other tools
+v doctor                    # System diagnostics
+v up                        # Update V
+v self                      # Recompile V compiler
+```
+
+## Web Development
+
+### VEB Framework
+```v
+module main
+
+import veb
+
+struct App {
+    veb.Context
+}
+
+pub fn (mut app App) index() veb.Result {
+    return app.html('<h1>Hello, VEB!</h1>')
+}
+
+['/user/:id']
+pub fn (mut app App) user(id int) veb.Result {
+    return app.json('{"user_id": ${id}}')
+}
+
+fn main() {
+    mut app := &App{}
+    veb.run(app, 8080)
+}
+```
+
+### JSON API Example
+```v
+import json
+import net.http
+
+struct User {
+    id   int
+    name string
+    email string
+}
+
+fn main() {
+    user := User{1, 'Alice', 'alice@example.com'}
+    json_data := json.encode(user)
+    
+    resp := http.post_json('http://api.example.com/users', json_data) or {
+        println('Request failed: ${err}')
+        return
+    }
+    
+    println('Response: ${resp.body}')
+}
+```
+
+## Testing Framework
+
+### Test Structure
+```v
+// math_test.v
+module main
+
+fn test_addition() {
+    assert add(2, 3) == 5
+    assert add(-1, 1) == 0
+}
+
+fn test_division() {
+    result, ok := divide(10, 2)
+    assert ok
+    assert result == 5.0
+    
+    _, ok2 := divide(10, 0)
+    assert !ok2
+}
+```
+
+### Running Tests
+```bash
+v test .                    # Run all tests
+v test math_test.v          # Run specific test file
+v test -stats .             # Show test statistics
+```
+
+## Cross-Platform Deployment
+
+### Static Compilation
+```bash
+# Linux static binary
+v -prod -cflags '-static' hello.v
+
+# Windows cross-compilation (from Linux)
+v -os windows hello.v
+
+# macOS cross-compilation  
+v -os macos hello.v
+```
+
+### Docker Support
+```dockerfile
+FROM vlang:alpine
+COPY . /app
+WORKDIR /app
+RUN v -prod main.v
+CMD ["./main"]
+```
+
+## Performance Optimization
+
+### Compilation Flags
+```bash
+v -prod app.v               # Production optimizations
+v -fast app.v               # Fast math operations
+v -skip-unused app.v        # Skip unused functions
+v -compress app.v           # Compress binary
+```
+
+### Memory Optimization
+```bash
+v -gc none app.v            # Manual memory management
+v -prealloc app.v           # Pre-allocate memory
+v -autofree app.v           # Automatic memory freeing
+```
+
+## Notable Examples and Applications
+
+### Games and Graphics
+- **2048**: Complete 2048 game implementation
+- **Tetris**: Classic Tetris with OpenGL graphics
+- **Asteroids**: Space shooter game
+- **Breakout**: Brick breaker game
+
+### Networking
+- **HTTP Server**: Web server implementations
+- **WebSocket Chat**: Real-time chat application  
+- **REST API**: RESTful service examples
+
+### System Programming  
+- **File Manager**: File system utilities
+- **System Monitor**: Resource monitoring tools
+- **CLI Tools**: Command-line applications
+
+### WebAssembly
+- **WASM Examples**: Compile V to WebAssembly
+- **Browser Integration**: Running V in web browsers
+
+## Documentation and Resources
+
+### Official Documentation
+- **Complete Language Guide**: `doc/docs.md` - Comprehensive language documentation
+- **Contributing Guide**: `CONTRIBUTING.md` - How to contribute to V
+- **API Reference**: https://modules.vlang.io - Standard library documentation
+- **Online Docs**: https://docs.vlang.io - Web-based documentation
+
+### Community Resources
+- **Discord**: https://discord.gg/vlang - Community chat
+- **GitHub Discussions**: Project discussions and Q&A
+- **Modules Registry**: https://vpm.vlang.io - Third-party modules
+
+## Installation and Setup
+
+### Quick Installation
+```bash
+# Clone and build from source (recommended)
+git clone --depth=1 https://github.com/vlang/v
+cd v
+make
+
+# Add to PATH
+sudo ./v symlink
+```
+
+### System Requirements
+- **OS**: Linux, macOS, Windows, *BSD, Solaris
+- **Dependencies**: C compiler (GCC, Clang, MSVC, or TCC)
+- **Memory**: Minimal requirements
+- **Disk Space**: ~50MB for V installation
+
+### IDE Support
+- **VS Code**: V extension with syntax highlighting and IntelliSense
+- **Vim/Neovim**: V syntax plugin
+- **Emacs**: V-mode for Emacs
+- **JetBrains**: V plugin for IntelliJ/CLion
+- **Sublime Text**: V syntax highlighting
+
+## Project Governance
+
+- **License**: MIT License - permissive open source
+- **Maintainer**: Alex Medvednikov and the V team
+- **Version**: Currently 0.4.12, approaching 1.0 stable release
+- **Stability**: Post-1.0 feature freeze planned (similar to Go)
+- **Backward Compatibility**: Strong commitment to backward compatibility after 1.0
+
+This comprehensive overview covers the V programming language project structure, features, and capabilities for LLM understanding and assistance.
