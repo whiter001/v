@@ -1,0 +1,145 @@
+# V Programming Language
+
+V is a statically typed compiled programming language designed for building maintainable software.
+
+## Project Overview
+
+- **Name**: V Programming Language
+- **Version**: 0.4.12
+- **License**: MIT
+- **Repository**: https://github.com/vlang/v
+- **Description**: Simple, fast, safe, compiled language for developing maintainable software
+
+## Key Features
+
+- **Simplicity**: The language can be learned over a weekend
+- **Fast compilation**: ≈110k loc/s with Clang backend, ≈500k loc/s with native and tcc backends
+- **Performance**: As fast as C (V's main backend compiles to human-readable C)
+- **Safety**: No null, no globals, no undefined behavior, immutability by default
+- **Memory management**: GC by default, manual via `-gc none`, arena allocation, autofree
+- **Cross-platform**: Works on Linux, macOS, Windows, *BSD, Solaris, WSL
+- **Multiple backends**: C, JavaScript, and native machine code generation
+
+## Project Structure
+
+```
+v/
+├── cmd/              # V compiler and tools
+├── vlib/             # V standard library (57+ modules)
+├── examples/         # Code examples and demos (67+ examples)
+├── doc/              # Documentation
+├── thirdparty/       # Third-party dependencies
+├── ci/               # Continuous integration scripts
+├── tutorials/        # Learning materials
+└── bench/            # Benchmarks and performance tests
+```
+
+## Core Modules (vlib/)
+
+- **builtin**: Core language functionality
+- **os**: Operating system interface
+- **net**: Networking (HTTP, WebSocket, etc.)
+- **json**: JSON encoding/decoding
+- **crypto**: Cryptographic functions
+- **db**: Database drivers
+- **math**: Mathematical functions
+- **time**: Time and date handling
+- **regex**: Regular expressions
+- **arrays**: Array utilities
+- **strings**: String manipulation
+- **io**: Input/output operations
+
+## Hello World Example
+
+```v
+println('Hello, World!')
+```
+
+## Basic Syntax Examples
+
+### Variables and Functions
+```v
+fn main() {
+    name := 'World'
+    age := 25
+    println('Hello, ${name}! Age: ${age}')
+}
+
+fn add(x int, y int) int {
+    return x + y
+}
+```
+
+### Structs and Methods
+```v
+struct User {
+    name string
+    age  int
+}
+
+fn (u User) greet() {
+    println('Hello, I am ${u.name}')
+}
+```
+
+### Arrays and Maps
+```v
+numbers := [1, 2, 3, 4, 5]
+user_ages := {'Alice': 30, 'Bob': 25}
+```
+
+## Building and Running
+
+### Installation
+```bash
+git clone --depth=1 https://github.com/vlang/v
+cd v
+make
+```
+
+### Running V programs
+```bash
+v run hello_world.v                # Compile and run
+v hello_world.v                    # Compile only
+v -prod hello_world.v              # Production build
+```
+
+## Key Commands
+
+- `v help`: Show help information
+- `v up`: Update V to latest version
+- `v init`: Initialize new V project
+- `v fmt`: Format V code
+- `v test`: Run tests
+- `v build-module`: Build a module
+- `v install`: Install V modules
+
+## Development Tools
+
+- **V Language Server**: IDE support with v-analyzer
+- **Built-in formatter**: `v fmt`
+- **Built-in testing**: `v test`
+- **Cross-compilation**: Easy targeting of different platforms
+
+## Notable Examples
+
+- **2048**: Game implementation
+- **Tetris**: Classic game with graphics
+- **HTTP Server**: Web server examples
+- **CLI tools**: Command-line applications
+- **WebAssembly**: WASM compilation examples
+- **Graphics**: OpenGL and Sokol-based applications
+
+## Documentation
+
+- Main docs: `doc/docs.md`
+- Contributing: `CONTRIBUTING.md`
+- Changelog: `CHANGELOG.md`
+- Online docs: https://docs.vlang.io/
+- Module docs: https://modules.vlang.io/
+
+## License
+
+MIT License - See LICENSE file for details.
+
+This project contains approximately 4,457 V source files and is actively maintained.
