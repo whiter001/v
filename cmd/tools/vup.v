@@ -16,6 +16,7 @@ struct App {
 
 	skip_v_self  bool // do not run `v self`, effectively enforcing the running of `make` or `make.bat`
 	skip_current bool // skip the current hash check, enabling easier testing on the same commit, without using docker etc
+	sync_fork    bool // sync fork with upstream instead of direct pull
 }
 
 const args = arguments()
@@ -28,10 +29,15 @@ fn new_app() App {
 		vroot:        vroot
 		skip_v_self:  '-skip_v_self' in args
 		skip_current: '-skip_current' in args
+		sync_fork:    '-sync_fork' in args || '--sync-fork' in args
 	}
 }
 
 fn main() {
+	if '-h' in args || '--help' in args {
+		show_help()
+		return
+	}
 	app := new_app()
 	recompilation.must_be_enabled(app.vroot, 'Please install V from source, to use `v up` .')
 	os.chdir(app.vroot)!
@@ -77,8 +83,54 @@ fn (app App) update_from_master() {
 		// Note 2: patterns ending with / are treated as folders.
 		app.git_command('git clean -xfd --exclude /thirdparty/tcc/ --exclude /v --exclude /v.exe --exclude /cmd/tools/vup --exclude /cmd/tools/vup.exe')
 	} else {
-		// pull latest
-		app.git_command('git pull https://github.com/vlang/v master')
+		if app.sync_fork {
+			app.sync_fork_with_upstream()
+		} else {
+			// pull latest
+			app.git_command('git pull https://github.com/vlang/v master')
+		}
+	}
+}
+
+fn (app App) sync_fork_with_upstream() {
+	app.vprintln('> syncing fork with upstream ...')
+	
+	// Check if upstream remote exists
+	remotes_result := os.execute('git remote')
+	if remotes_result.exit_code == 0 && !remotes_result.output.contains('upstream') {
+		app.vprintln('> adding upstream remote ...')
+		app.git_command('git remote add upstream https://github.com/vlang/v')
+	}
+	
+	// Fetch from upstream
+	app.git_command('git fetch upstream')
+	
+	// Check current branch
+	branch_result := os.execute('git branch --show-current')
+	if branch_result.exit_code != 0 {
+		eprintln('Failed to get current branch')
+		exit(1)
+	}
+	current_branch := branch_result.output.trim_space()
+	
+	// Switch to master if not already there
+	if current_branch != 'master' {
+		app.git_command('git checkout master')
+	}
+	
+	// Merge upstream changes
+	app.git_command('git merge upstream/master')
+	
+	// Push to origin (fork)
+	origin_result := os.execute('git remote get-url origin')
+	if origin_result.exit_code == 0 && !origin_result.output.contains('vlang/v') {
+		app.vprintln('> pushing to fork ...')
+		app.git_command('git push origin master')
+	}
+	
+	// Switch back to original branch if needed
+	if current_branch != 'master' {
+		app.git_command('git checkout ${current_branch}')
 	}
 }
 
@@ -204,4 +256,28 @@ fn make_sure_cmd_is_available(cmd string) {
 		exit(1)
 	}
 	println('Found `${cmd}` as `${found_path}`.')
+}
+
+fn show_help() {
+	println('V updater tool - Update V from upstream repository')
+	println('')
+	println('Usage:')
+	println('  v up [options]')
+	println('')
+	println('Options:')
+	println('  -h, --help       Show this help message')
+	println('  -v               Verbose output')
+	println('  -prod            Compile V in production mode')
+	println('  -skip_v_self     Skip running `v self`, enforce `make` usage')
+	println('  -skip_current    Skip current hash check')
+	println('  -sync_fork       Sync fork with upstream (for forked repositories)')
+	println('  --sync-fork      Alias for -sync_fork')
+	println('')
+	println('Examples:')
+	println('  v up                    # Update V from upstream')
+	println('  v up -v                 # Update with verbose output')
+	println('  v up -sync_fork         # Sync your fork with upstream')
+	println('')
+	println('For more information about fork synchronization, see:')
+	println('  FORK_SYNC.md')
 }
