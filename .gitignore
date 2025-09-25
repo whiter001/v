@@ -160,3 +160,5 @@ bench/vectors/obj
 autofuzz.log
 .project.gf
 .aider*
+v1
+v2
