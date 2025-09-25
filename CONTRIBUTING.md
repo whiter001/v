@@ -138,6 +138,9 @@ accordingly in the steps below.)
    making pull requests, and you can just do normal git operations such as:
    `git pull` `git status` and so on.
 
+   **Fork Synchronization**: If you want to keep your fork's master branch synchronized 
+   with the upstream V repository, see [FORK_SYNC.md](FORK_SYNC.md) for detailed instructions.
+
 5. When finished with a feature/bugfix/change, you can:
    `git checkout -b fix_alabala`
    - Don't forget to keep formatting standards, run `v fmt -w YOUR_MODIFIED_FILES`
