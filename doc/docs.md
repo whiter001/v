@@ -188,9 +188,9 @@ by using any of the following commands in a terminal:
         * [Compile time code](#compile-time-code)
         * [Compile time types](#compile-time-types)
         * [Environment specific files](#environment-specific-files)
-	* [Debugger](#debugger)
- 		* [Call stack](#call-stack)
-   		* [Trace](#trace)
+    * [Debugger](#debugger)
+        * [Call stack](#call-stack)
+        * [Trace](#trace)
     * [Memory-unsafe code](#memory-unsafe-code)
     * [Structs with reference fields](#structs-with-reference-fields)
     * [sizeof and __offsetof](#sizeof-and-__offsetof)
@@ -2403,7 +2403,7 @@ my_label:
 ```
 
 `goto` should be avoided, particularly when `for` can be used instead.
-[Labelled break/continue](#labelled-break--continue) can be used to break out of
+[Labelled break & continue](#labelled-break--continue) can be used to break out of
 a nested loop, and those do not risk violating memory-safety.
 
 ## Structs
@@ -3014,7 +3014,7 @@ b := [5, 6, 7]
 println(sum(...b)) // output: 18
 ```
 
-### Anonymous & higher order functions
+### Anonymous & higher-order functions
 
 ```v
 fn sqr(n int) int {
@@ -5799,7 +5799,7 @@ Package are up to date.
 **Optional:** tag your V package with `vlang` and `vlang-package` on github.com
 to allow for a better search experience.
 
-# Advanced Topics
+## Advanced Topics
 
 ## Attributes
 
@@ -8267,7 +8267,7 @@ Note: there is a small shell script `cmd/tools/vrun`, that can be useful for sys
 env program (`/usr/bin/env`), that still does not support an `-S` option (like BusyBox).
 See https://github.com/vlang/v/blob/master/cmd/tools/vrun for more details.
 
-# Appendices
+## Appendices
 
 ## Appendix I: Keywords
 
